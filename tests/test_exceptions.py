@@ -35,9 +35,3 @@ def test_top_level_errors_inherit_error(name):
 )
 def test_database_error_subclasses(name):
     assert issubclass(getattr(exc, name), exc.DatabaseError)
-
-
-def test_version_is_exposed():
-    import thunderduck_sqlalchemy
-
-    assert thunderduck_sqlalchemy.__version__ == "0.1.0"

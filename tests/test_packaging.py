@@ -31,3 +31,12 @@ def test_engine_can_be_created_from_a_url():
 
     engine = create_engine("thunderduck://:tdk_x@api.example.test/")
     assert engine.dialect.name == "thunderduck"
+
+
+def test_reported_version_matches_distribution_metadata():
+    """`__version__` must not drift from what `pip` and PyPI call the release."""
+    from importlib.metadata import version
+
+    from thunderduck_sqlalchemy import __version__
+
+    assert __version__ == version("thunderduck-sqlalchemy")

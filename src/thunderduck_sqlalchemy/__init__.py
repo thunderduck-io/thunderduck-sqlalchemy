@@ -10,6 +10,6 @@ from .bulk import fetch_dataframe, fetch_result_url
 from .dbapi import connect
 from .dialect import ThunderduckDialect
 
-__version__ = "0.1.0"
+__version__ = "1.0.2"
 
 __all__ = ["__version__", "connect", "ThunderduckDialect", "fetch_result_url", "fetch_dataframe"]

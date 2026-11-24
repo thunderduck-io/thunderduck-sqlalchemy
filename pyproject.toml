@@ -1,6 +1,6 @@
 [project]
 name = "thunderduck-sqlalchemy"
-version = "1.0.1"
+version = "1.0.2"
 description = "SQLAlchemy dialect and DBAPI for thunderduck.ai — query your lakehouse from Superset, Airflow, pandas and friends."
 readme = "README.md"
 authors = [
