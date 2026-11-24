@@ -1,0 +1,69 @@
+[project]
+name = "thunderduck-sqlalchemy"
+version = "1.0.1"
+description = "SQLAlchemy dialect and DBAPI for thunderduck.ai — query your lakehouse from Superset, Airflow, pandas and friends."
+readme = "README.md"
+authors = [
+    { name = "YILDIRIM ADIGUZEL", email = "developer@thunderduck.io" }
+]
+requires-python = ">=3.10"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+keywords = ["sqlalchemy", "duckdb", "iceberg", "lakehouse", "thunderduck", "superset"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Database",
+    "Topic :: Database :: Front-Ends",
+]
+# sqlalchemy>=1.4, NOT >=2.0: apache-superset 6.1.0 pins sqlalchemy<2, so a 2.0
+# floor would make this package uninstallable in the Superset image. See the
+# plan's Global Constraints.
+dependencies = [
+    "httpx>=0.27.0",
+    "sqlalchemy>=1.4",
+]
+
+# Deliberately no `apache-superset` extra: it cannot be resolved alongside
+# this package (its sqlalchemy<2 pin conflicts), and Superset supplies itself
+# at runtime anyway. pandas/polars below are unaffected by that constraint --
+# neither pins sqlalchemy at all.
+[project.optional-dependencies]
+pandas = ["pandas>=2.0", "pyarrow>=14.0"]
+polars = ["polars>=1.0"]
+
+[project.urls]
+Homepage = "https://thunderduck.ai"
+Documentation = "https://docs.thunderduck.ai/clients/sqlalchemy"
+Source = "https://github.com/thunderduck-io/thunderduck-sqlalchemy"
+Issues = "https://github.com/thunderduck-io/thunderduck-sqlalchemy/issues"
+
+[project.entry-points."sqlalchemy.dialects"]
+thunderduck = "thunderduck_sqlalchemy.dialect:ThunderduckDialect"
+"thunderduck.rest" = "thunderduck_sqlalchemy.dialect:ThunderduckDialect"
+
+[project.entry-points."superset.db_engine_specs"]
+thunderduck = "thunderduck_sqlalchemy.superset_spec:ThunderduckEngineSpec"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0.0",
+    "ruff>=0.8.0",
+]
+
+[build-system]
+requires = ["uv_build>=0.12.1,<0.13.0"]
+build-backend = "uv_build"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]

@@ -1,0 +1,52 @@
+# Tests for thunderduck-sqlalchemy, run on every push and pull request.
+# No publishing and no secrets: releases are cut from Thunderduck's internal
+# source, not from this mirror. See CONTRIBUTING.md.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Superset 6.1.0 pins sqlalchemy<2; modern Airflow, Dagster and
+          # pandas environments are on 2.x. Both are supported.
+          - python: "3.10"
+            sqlalchemy: "<2"
+          - python: "3.12"
+            sqlalchemy: ">=2.0"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        run: uv python install ${{ matrix.python }}
+
+      - name: Install with a pinned SQLAlchemy
+        run: |
+          uv venv --python ${{ matrix.python }}
+          uv pip install -e . "sqlalchemy${{ matrix.sqlalchemy }}" pytest ruff
+
+      - name: Show resolved versions
+        run: uv run --no-sync python -c "import sqlalchemy,sys; print('python', sys.version); print('sqlalchemy', sqlalchemy.__version__)"
+
+      - name: Lint
+        run: |
+          uv run --no-sync ruff check .
+          uv run --no-sync ruff format --check .
+
+      - name: Test
+        run: uv run --no-sync pytest -v
